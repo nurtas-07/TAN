@@ -1,0 +1,1530 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ТАН — Финансовый Автопилот</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --blue: #0047AB;
+  --blue-light: #1a5fd4;
+  --blue-pale: #e8effc;
+  --green: #2ECC71;
+  --green-dark: #27ae60;
+  --red: #E74C3C;
+  --orange: #F39C12;
+  --purple: #8E44AD;
+  --bg: #F5F5F7;
+  --white: #ffffff;
+  --card: rgba(255,255,255,0.85);
+  --text: #1a1a2e;
+  --text-muted: #6b7280;
+  --border: rgba(0,71,171,0.1);
+  --shadow: 0 8px 40px rgba(0,71,171,0.10);
+  --shadow-lg: 0 20px 60px rgba(0,71,171,0.15);
+  --r: 24px;
+  --r-sm: 14px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Manrope', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ===== SCROLLBAR ===== */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--blue); border-radius: 99px; }
+
+/* ===== PAGES ===== */
+.page { display: none; min-height: 100vh; }
+.page.active { display: block; }
+
+/* ===== LANDING ===== */
+#page-landing {
+  background: linear-gradient(160deg, #0a0e27 0%, #0d1b4b 40%, #0e2464 100%);
+  color: white;
+}
+
+.landing-nav {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 20px 48px;
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(10,14,39,0.7);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+}
+
+.logo {
+  font-family: 'Playfair Display', serif;
+  font-size: 26px; font-weight: 900;
+  background: linear-gradient(135deg, #ffffff, #7eb3ff);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  letter-spacing: -1px;
+}
+
+.nav-links { display: flex; gap: 32px; }
+.nav-links a {
+  color: rgba(255,255,255,0.7); text-decoration: none;
+  font-size: 14px; font-weight: 500;
+  transition: color 0.2s;
+}
+.nav-links a:hover { color: white; }
+
+.btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 12px 28px; border-radius: 50px;
+  font-family: 'Manrope', sans-serif; font-size: 15px; font-weight: 700;
+  border: none; cursor: pointer; transition: all 0.25s;
+  text-decoration: none;
+}
+.btn-primary {
+  background: linear-gradient(135deg, #1a5fd4, #0047AB);
+  color: white;
+  box-shadow: 0 8px 30px rgba(0,71,171,0.4);
+}
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(0,71,171,0.5); }
+.btn-white {
+  background: white; color: var(--blue); font-weight: 800;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+}
+.btn-white:hover { transform: translateY(-2px); }
+.btn-outline {
+  background: rgba(255,255,255,0.1); color: white;
+  border: 1px solid rgba(255,255,255,0.3);
+}
+.btn-outline:hover { background: rgba(255,255,255,0.2); }
+
+/* HERO */
+.hero {
+  padding: 80px 48px 100px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero::before {
+  content: '';
+  position: absolute; top: -200px; left: 50%; transform: translateX(-50%);
+  width: 800px; height: 800px;
+  background: radial-gradient(circle, rgba(0,71,171,0.4) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(46,204,113,0.15); border: 1px solid rgba(46,204,113,0.3);
+  color: #2ECC71; padding: 6px 16px; border-radius: 50px;
+  font-size: 13px; font-weight: 600; margin-bottom: 32px;
+}
+.hero-badge span { width: 8px; height: 8px; background: #2ECC71; border-radius: 50%; animation: pulse 2s infinite; }
+
+@keyframes pulse { 0%,100% { opacity:1; transform:scale(1); } 50% { opacity:0.5; transform:scale(1.3); } }
+
+.hero h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(40px, 6vw, 80px); font-weight: 900; line-height: 1.05;
+  margin-bottom: 24px;
+  background: linear-gradient(135deg, #ffffff 0%, #9ec4ff 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+
+.hero p {
+  font-size: 18px; color: rgba(255,255,255,0.65); max-width: 560px; margin: 0 auto 40px;
+  line-height: 1.7;
+}
+
+.hero-cta { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+
+.hero-stats {
+  display: flex; gap: 48px; justify-content: center; margin-top: 72px;
+  flex-wrap: wrap;
+}
+.hero-stat { text-align: center; }
+.hero-stat .num {
+  font-size: 36px; font-weight: 800;
+  background: linear-gradient(135deg, white, #7eb3ff);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+.hero-stat .label { font-size: 13px; color: rgba(255,255,255,0.5); margin-top: 4px; }
+
+/* MOCK APP PREVIEW */
+.hero-preview {
+  margin: 60px auto 0; max-width: 380px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 32px; padding: 20px;
+  backdrop-filter: blur(10px);
+  animation: float 6s ease-in-out infinite;
+}
+@keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-12px)} }
+
+.preview-screen {
+  background: #F5F5F7; border-radius: 20px; padding: 16px; color: var(--text);
+}
+.preview-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; }
+.preview-header .greeting { font-size:11px; color:var(--text-muted); }
+.preview-header .name { font-size:14px; font-weight:700; }
+.preview-gauge-wrap { text-align:center; margin-bottom:16px; }
+.preview-gauge {
+  width:120px; height:60px; margin:0 auto;
+  background: conic-gradient(from 180deg, #2ECC71 0deg, #F39C12 120deg, #E74C3C 180deg);
+  border-radius: 120px 120px 0 0;
+  position:relative; overflow:hidden;
+}
+.preview-gauge::after {
+  content:''; position:absolute; bottom:0; left:50%; transform:translateX(-50%);
+  width:80px; height:40px; background:#F5F5F7; border-radius:80px 80px 0 0;
+}
+.preview-stress { font-size:22px; font-weight:800; color:var(--blue); }
+.preview-stress-label { font-size:10px; color:var(--text-muted); }
+.preview-cards { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.preview-card { background:white; border-radius:12px; padding:10px; }
+.preview-card .pc-label { font-size:9px; color:var(--text-muted); }
+.preview-card .pc-val { font-size:13px; font-weight:700; color:var(--text); }
+.preview-card .pc-val.green { color:var(--green-dark); }
+.preview-card .pc-val.red { color:var(--red); }
+
+/* PROBLEMS */
+.section { padding: 80px 48px; }
+.section-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(28px, 4vw, 48px); font-weight: 700;
+  text-align: center; margin-bottom: 16px;
+  color: white;
+}
+.section-sub { text-align:center; color:rgba(255,255,255,0.55); font-size:16px; margin-bottom:56px; }
+
+.problems-grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(260px,1fr)); gap:20px; max-width:1100px; margin:0 auto; }
+
+.problem-card {
+  background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+  border-radius: var(--r); padding: 32px;
+  transition: all 0.3s;
+}
+.problem-card:hover { background: rgba(255,255,255,0.08); transform:translateY(-4px); }
+.problem-card .icon { font-size: 40px; margin-bottom: 20px; }
+.problem-card h3 { font-size: 18px; font-weight: 700; margin-bottom: 10px; color:white; }
+.problem-card p { font-size: 14px; color: rgba(255,255,255,0.55); line-height:1.6; }
+.problem-card .tag {
+  display:inline-block; margin-top:14px; padding:4px 12px;
+  background: rgba(231,76,60,0.2); color:#ff7675;
+  border-radius:50px; font-size:11px; font-weight:700;
+}
+
+/* SOLUTION */
+.solution-steps { display:grid; grid-template-columns: repeat(auto-fit, minmax(280px,1fr)); gap:32px; max-width:1000px; margin:0 auto; }
+.step {
+  text-align:center;
+  position:relative;
+}
+.step-num {
+  width:56px; height:56px; border-radius:50%;
+  background: linear-gradient(135deg, var(--blue), #1a5fd4);
+  color:white; font-size:22px; font-weight:800;
+  display:flex; align-items:center; justify-content:center;
+  margin:0 auto 20px;
+  box-shadow: 0 8px 24px rgba(0,71,171,0.4);
+}
+.step h3 { font-size:20px; font-weight:700; color:white; margin-bottom:10px; }
+.step p { font-size:14px; color:rgba(255,255,255,0.55); line-height:1.6; }
+
+/* COMPARISON TABLE */
+.comparison-wrap { max-width:900px; margin:0 auto; }
+.comparison-table { width:100%; border-collapse:collapse; }
+.comparison-table th {
+  padding:16px 24px; text-align:left;
+  font-size:14px; font-weight:700;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  color:rgba(255,255,255,0.6);
+}
+.comparison-table th.highlight { color:var(--green); }
+.comparison-table td {
+  padding:14px 24px; font-size:14px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  color:rgba(255,255,255,0.75);
+}
+.comparison-table td.feature { font-weight:600; color:white; }
+.comparison-table td.check { color:var(--green); font-weight:700; font-size:18px; }
+.comparison-table td.cross { color:rgba(255,255,255,0.25); font-size:18px; }
+.comparison-table tr:hover td { background: rgba(255,255,255,0.03); }
+
+/* LANDING CTA */
+.landing-cta {
+  background: linear-gradient(135deg, rgba(0,71,171,0.3), rgba(26,95,212,0.2));
+  border: 1px solid rgba(0,71,171,0.4);
+  border-radius: 32px; padding: 72px 48px; text-align:center;
+  max-width:800px; margin:0 auto;
+  position:relative; overflow:hidden;
+}
+.landing-cta::before {
+  content:''; position:absolute; top:-100px; right:-100px;
+  width:300px; height:300px;
+  background: radial-gradient(circle, rgba(46,204,113,0.15), transparent);
+  pointer-events:none;
+}
+.landing-cta h2 { font-family:'Playfair Display',serif; font-size:40px; margin-bottom:16px; }
+.landing-cta p { color:rgba(255,255,255,0.6); font-size:16px; margin-bottom:36px; }
+
+/* ===== APP SHELL ===== */
+#page-app {
+  background: var(--bg);
+  padding-bottom: 90px;
+  min-height: 100vh;
+}
+
+.app-header {
+  background: white;
+  padding: 16px 20px;
+  display: flex; align-items:center; justify-content:space-between;
+  position: sticky; top:0; z-index:50;
+  box-shadow: 0 1px 0 var(--border);
+}
+.app-header .logo { font-size:20px; background: linear-gradient(135deg, #0047AB, #1a5fd4); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.app-header .greeting-wrap { text-align:right; }
+.app-header .greeting-name { font-size:13px; font-weight:700; }
+.app-header .greeting-sub { font-size:11px; color:var(--text-muted); }
+.app-avatar {
+  width:38px; height:38px; border-radius:50%;
+  background: linear-gradient(135deg, var(--blue), var(--blue-light));
+  display:flex; align-items:center; justify-content:center;
+  color:white; font-weight:700; font-size:15px;
+}
+
+/* BOTTOM NAV */
+.bottom-nav {
+  position:fixed; bottom:0; left:0; right:0; z-index:100;
+  background: rgba(255,255,255,0.95);
+  backdrop-filter: blur(20px);
+  border-top: 1px solid var(--border);
+  display:flex;
+  padding: 8px 0 max(8px,env(safe-area-inset-bottom));
+}
+.nav-tab {
+  flex:1; display:flex; flex-direction:column; align-items:center; gap:4px;
+  padding: 8px 4px; cursor:pointer;
+  border:none; background:none; color:var(--text-muted);
+  font-family:'Manrope',sans-serif; font-size:10px; font-weight:600;
+  transition: color 0.2s;
+}
+.nav-tab.active { color:var(--blue); }
+.nav-tab .nav-icon { font-size:22px; }
+
+/* TAB CONTENT */
+.tab-content { display:none; padding:16px; }
+.tab-content.active { display:block; }
+
+/* CARDS */
+.card {
+  background: var(--card); border-radius: var(--r);
+  padding: 20px; margin-bottom: 16px;
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.8);
+}
+.card-sm { border-radius: var(--r-sm); padding: 14px; }
+
+.section-label {
+  font-size:11px; font-weight:700; color:var(--text-muted);
+  text-transform:uppercase; letter-spacing:0.08em;
+  margin-bottom:12px; margin-top:8px;
+}
+
+/* ===== HOME TAB ===== */
+/* FSI Gauge */
+.fsi-card {
+  background: linear-gradient(135deg, #0047AB 0%, #1a5fd4 100%);
+  color:white; text-align:center; padding:28px 20px;
+}
+.fsi-title { font-size:12px; font-weight:600; opacity:0.7; text-transform:uppercase; letter-spacing:0.1em; margin-bottom:20px; }
+.gauge-container { position:relative; width:180px; height:100px; margin:0 auto 16px; }
+.gauge-svg { width:100%; }
+.gauge-value-wrap { position:absolute; bottom:0; left:50%; transform:translateX(-50%); text-align:center; }
+.gauge-value { font-size:40px; font-weight:900; line-height:1; }
+.gauge-label { font-size:11px; opacity:0.7; margin-top:2px; }
+
+.fsi-meta { display:flex; gap:20px; justify-content:center; margin-top:16px; }
+.fsi-meta-item { text-align:center; }
+.fsi-meta-item .val { font-size:18px; font-weight:800; }
+.fsi-meta-item .lbl { font-size:10px; opacity:0.6; }
+
+/* Accounts */
+.accounts-row { display:flex; gap:12px; overflow-x:auto; padding-bottom:4px; }
+.accounts-row::-webkit-scrollbar { height:3px; }
+.account-card {
+  min-width: 150px; border-radius: var(--r-sm);
+  padding: 14px; position:relative; overflow:hidden;
+  flex-shrink:0;
+}
+.account-card.kaspi { background: linear-gradient(135deg, #e74c3c, #c0392b); color:white; }
+.account-card.halyk { background: linear-gradient(135deg, #27ae60, #1e8449); color:white; }
+.account-card.forte { background: linear-gradient(135deg, #8E44AD, #6c3483); color:white; }
+.account-card .bank-name { font-size:11px; opacity:0.75; font-weight:600; }
+.account-card .bank-bal { font-size:20px; font-weight:800; margin-top:8px; }
+.account-card .bank-num { font-size:10px; opacity:0.6; margin-top:4px; }
+.account-card .bank-icon { position:absolute; top:12px; right:12px; font-size:24px; opacity:0.4; }
+
+/* Cushion */
+.cushion-card {
+  background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+  border: 1px solid rgba(46,204,113,0.2);
+}
+.cushion-months { font-size:48px; font-weight:900; color:var(--green-dark); line-height:1; }
+.cushion-label { font-size:13px; color:var(--green-dark); font-weight:600; }
+.cushion-bar { height:8px; background:#d1fae5; border-radius:99px; margin-top:16px; overflow:hidden; }
+.cushion-fill { height:100%; width:72%; background:linear-gradient(90deg,var(--green),var(--green-dark)); border-radius:99px; transition:width 1s; }
+
+/* Quick stats */
+.quick-stats { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+.qstat { background:white; border-radius:var(--r-sm); padding:16px; border:1px solid var(--border); }
+.qstat .qs-label { font-size:11px; color:var(--text-muted); font-weight:600; }
+.qstat .qs-val { font-size:22px; font-weight:800; margin-top:4px; }
+.qstat .qs-val.up { color:var(--green-dark); }
+.qstat .qs-val.down { color:var(--red); }
+.qstat .qs-change { font-size:11px; margin-top:2px; }
+
+/* Recent transactions */
+.tx-item {
+  display:flex; align-items:center; gap:12px;
+  padding:10px 0; border-bottom:1px solid var(--border);
+}
+.tx-item:last-child { border-bottom:none; }
+.tx-icon { width:40px; height:40px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0; }
+.tx-info { flex:1; }
+.tx-name { font-size:14px; font-weight:600; }
+.tx-cat { font-size:11px; color:var(--text-muted); }
+.tx-amt { font-size:15px; font-weight:700; }
+.tx-amt.neg { color:var(--red); }
+.tx-amt.pos { color:var(--green-dark); }
+
+/* ===== BUDGET TAB ===== */
+.income-input-card {
+  background: linear-gradient(135deg, var(--blue), var(--blue-light));
+  color:white;
+}
+.income-display { font-size:36px; font-weight:900; text-align:center; padding:12px 0; }
+.income-display span { font-size:20px; opacity:0.7; }
+
+.envelopes-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+.envelope {
+  border-radius:var(--r-sm); padding:16px; cursor:pointer;
+  transition: all 0.25s; position:relative; overflow:hidden;
+}
+.envelope:hover { transform:scale(1.02); }
+.envelope.red { background:linear-gradient(135deg,#fef2f2,#fee2e2); border:1.5px solid rgba(231,76,60,0.2); }
+.envelope.green { background:linear-gradient(135deg,#f0fdf4,#dcfce7); border:1.5px solid rgba(46,204,113,0.2); }
+.envelope.blue { background:linear-gradient(135deg,#eff6ff,#dbeafe); border:1.5px solid rgba(59,130,246,0.2); }
+.envelope.purple { background:linear-gradient(135deg,#faf5ff,#ede9fe); border:1.5px solid rgba(142,68,173,0.2); }
+.env-label { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; opacity:0.6; }
+.env-name { font-size:14px; font-weight:700; margin:4px 0; }
+.env-amount { font-size:20px; font-weight:900; }
+.envelope.red .env-amount { color:var(--red); }
+.envelope.green .env-amount { color:var(--green-dark); }
+.envelope.blue .env-amount { color:#1d4ed8; }
+.envelope.purple .env-amount { color:var(--purple); }
+.env-bar { height:4px; border-radius:99px; margin-top:10px; background:rgba(0,0,0,0.08); overflow:hidden; }
+.env-fill { height:100%; border-radius:99px; transition:width 0.8s; }
+.envelope.red .env-fill { background:var(--red); }
+.envelope.green .env-fill { background:var(--green); }
+.envelope.blue .env-fill { background:#1d4ed8; }
+.envelope.purple .env-fill { background:var(--purple); }
+.env-sub { font-size:10px; margin-top:4px; opacity:0.5; }
+
+/* Money Meeting */
+.meeting-card {
+  background: linear-gradient(135deg, #0a0e27, #0d1b4b);
+  color:white; border-radius:var(--r); padding:20px;
+  margin-bottom:16px;
+}
+.meeting-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; }
+.meeting-title { font-size:16px; font-weight:700; }
+.meeting-badge { background:rgba(46,204,113,0.2); color:#2ECC71; padding:4px 12px; border-radius:50px; font-size:11px; font-weight:700; }
+.slider-group { margin-bottom:16px; }
+.slider-label { display:flex; justify-content:space-between; font-size:13px; margin-bottom:6px; }
+.slider-label span:first-child { opacity:0.7; }
+.slider-label span:last-child { font-weight:700; }
+.slider-wrap { position:relative; }
+input[type=range] {
+  -webkit-appearance:none; width:100%; height:6px; border-radius:99px;
+  outline:none; cursor:pointer;
+}
+input[type=range].red-slider { background: linear-gradient(90deg, var(--red) var(--val,40%), rgba(255,255,255,0.15) var(--val,40%)); }
+input[type=range].green-slider { background: linear-gradient(90deg, var(--green) var(--val,25%), rgba(255,255,255,0.15) var(--val,25%)); }
+input[type=range].blue-slider { background: linear-gradient(90deg, #3b82f6 var(--val,20%), rgba(255,255,255,0.15) var(--val,20%)); }
+input[type=range].purple-slider { background: linear-gradient(90deg, var(--purple) var(--val,15%), rgba(255,255,255,0.15) var(--val,15%)); }
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance:none; width:18px; height:18px; border-radius:50%;
+  background:white; box-shadow:0 2px 8px rgba(0,0,0,0.3); cursor:pointer;
+}
+.remaining-bar {
+  background:rgba(255,255,255,0.08); border-radius:12px; padding:12px 16px;
+  display:flex; justify-content:space-between; align-items:center; margin-top:4px;
+}
+.remaining-bar .label { font-size:12px; opacity:0.6; }
+.remaining-bar .val { font-size:18px; font-weight:800; color:var(--green); }
+
+/* ===== DEBTS TAB ===== */
+.total-debt-card {
+  background: linear-gradient(135deg, #1a0a0a, #3d0c0c);
+  color:white; text-align:center; padding:28px 20px;
+  border-radius:var(--r); margin-bottom:16px;
+}
+.total-debt-label { font-size:12px; font-weight:600; opacity:0.6; text-transform:uppercase; letter-spacing:0.1em; }
+.total-debt-amount { font-size:48px; font-weight:900; color:#ff7675; margin:8px 0; }
+.total-debt-sub { font-size:13px; opacity:0.6; }
+.debt-meta { display:flex; gap:16px; justify-content:center; margin-top:20px; }
+.debt-meta-item { text-align:center; background:rgba(255,255,255,0.08); border-radius:12px; padding:10px 20px; }
+.debt-meta-item .v { font-size:18px; font-weight:800; }
+.debt-meta-item .l { font-size:10px; opacity:0.6; }
+
+.debt-card {
+  background:white; border-radius:var(--r-sm); padding:16px; margin-bottom:12px;
+  border-left:4px solid; transition:all 0.2s; cursor:pointer;
+}
+.debt-card:hover { transform:translateX(4px); box-shadow:var(--shadow); }
+.debt-card.kaspi-red { border-color:var(--red); }
+.debt-card.halyk-green { border-color:var(--green-dark); }
+.debt-card.forte-purple { border-color:var(--purple); }
+.debt-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:10px; }
+.debt-name { font-size:15px; font-weight:700; }
+.debt-rate { font-size:13px; color:var(--red); font-weight:700; }
+.debt-row { display:flex; justify-content:space-between; font-size:13px; margin-bottom:6px; }
+.debt-row .dl { color:var(--text-muted); }
+.debt-row .dv { font-weight:600; }
+.debt-progress { height:6px; background:#f1f5f9; border-radius:99px; overflow:hidden; }
+.debt-fill { height:100%; border-radius:99px; transition:width 0.8s; }
+.kaspi-red .debt-fill { background:var(--red); }
+.halyk-green .debt-fill { background:var(--green); }
+.forte-purple .debt-fill { background:var(--purple); }
+
+/* ===== FUTURE TAB ===== */
+.scenario-card {
+  background: linear-gradient(135deg, #0f172a, #1e293b);
+  color:white; border-radius:var(--r); padding:20px; margin-bottom:16px;
+}
+.scenario-title { font-size:16px; font-weight:700; margin-bottom:4px; }
+.scenario-sub { font-size:12px; opacity:0.5; margin-bottom:20px; }
+
+.debt-selector { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:20px; }
+.debt-sel-btn {
+  padding:6px 14px; border-radius:50px; font-size:12px; font-weight:700;
+  border:1.5px solid rgba(255,255,255,0.2); background:rgba(255,255,255,0.06);
+  color:rgba(255,255,255,0.6); cursor:pointer; transition:all 0.2s;
+  font-family:'Manrope',sans-serif;
+}
+.debt-sel-btn.selected { background:var(--blue); border-color:var(--blue); color:white; }
+
+.extra-payment { margin-bottom:20px; }
+.extra-label { font-size:13px; opacity:0.6; margin-bottom:8px; }
+.extra-amount { font-size:32px; font-weight:900; color:var(--green); text-align:center; margin:8px 0; }
+input[type=range].extra-slider {
+  background: linear-gradient(90deg, var(--green) var(--val,30%), rgba(255,255,255,0.15) var(--val,30%));
+}
+
+.scenario-result {
+  display:grid; grid-template-columns:1fr 1fr; gap:12px;
+}
+.sr-box {
+  background:rgba(255,255,255,0.06); border-radius:14px; padding:14px; text-align:center;
+}
+.sr-box .sr-label { font-size:10px; opacity:0.5; text-transform:uppercase; letter-spacing:0.08em; }
+.sr-box .sr-val { font-size:22px; font-weight:800; margin-top:6px; }
+.sr-box .sr-val.red { color:#ff7675; }
+.sr-box .sr-val.green { color:var(--green); }
+
+.timeline-card { background:white; border-radius:var(--r-sm); padding:16px; margin-bottom:12px; }
+.timeline-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
+.timeline-title { font-size:14px; font-weight:700; }
+.timeline-pill { padding:4px 10px; border-radius:50px; font-size:11px; font-weight:700; }
+.timeline-pill.saving { background:#dcfce7; color:var(--green-dark); }
+.timeline-pill.normal { background:#f1f5f9; color:var(--text-muted); }
+.timeline-bar { height:10px; background:#f1f5f9; border-radius:99px; overflow:hidden; position:relative; }
+.tl-current { height:100%; border-radius:99px; background:var(--red); opacity:0.3; }
+.tl-new { height:100%; border-radius:99px; background:var(--green); position:absolute; top:0; left:0; }
+
+/* P2P section */
+.p2p-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.p2p-item {
+  background:white; border-radius:var(--r-sm); padding:12px;
+  display:flex; align-items:center; gap:10px; border:1px solid var(--border);
+}
+.p2p-avatar { width:36px; height:36px; border-radius:50%; background:linear-gradient(135deg,var(--blue),var(--blue-light)); color:white; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:14px; flex-shrink:0; }
+.p2p-name { font-size:12px; font-weight:700; }
+.p2p-date { font-size:10px; color:var(--text-muted); }
+.p2p-amt { font-size:14px; font-weight:800; color:var(--red); }
+
+/* Tooltips & badges */
+.badge {
+  display:inline-flex; align-items:center; gap:4px;
+  padding:3px 10px; border-radius:50px; font-size:11px; font-weight:700;
+}
+.badge-red { background:#fef2f2; color:var(--red); }
+.badge-green { background:#f0fdf4; color:var(--green-dark); }
+.badge-blue { background:var(--blue-pale); color:var(--blue); }
+.badge-orange { background:#fff7ed; color:#c2410c; }
+
+/* Animations */
+@keyframes slideUp { from { opacity:0; transform:translateY(24px); } to { opacity:1; transform:translateY(0); } }
+@keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+.animate { animation: slideUp 0.5s ease forwards; }
+.animate-1 { animation-delay:0.1s; opacity:0; }
+.animate-2 { animation-delay:0.2s; opacity:0; }
+.animate-3 { animation-delay:0.3s; opacity:0; }
+.animate-4 { animation-delay:0.4s; opacity:0; }
+.animate-5 { animation-delay:0.5s; opacity:0; }
+
+/* Modal */
+.modal-overlay {
+  display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:200;
+  align-items:center; justify-content:center; padding:20px;
+  backdrop-filter:blur(4px);
+}
+.modal-overlay.open { display:flex; animation:fadeIn 0.2s; }
+.modal {
+  background:white; border-radius:var(--r); padding:28px; width:100%; max-width:400px;
+  animation:slideUp 0.3s;
+}
+.modal h3 { font-size:20px; font-weight:800; margin-bottom:16px; }
+.modal-close { float:right; background:none; border:none; font-size:22px; cursor:pointer; color:var(--text-muted); }
+
+/* Input styles */
+.input-group { margin-bottom:16px; }
+.input-group label { display:block; font-size:12px; font-weight:700; color:var(--text-muted); margin-bottom:6px; text-transform:uppercase; letter-spacing:0.06em; }
+.input-group input, .input-group select {
+  width:100%; padding:12px 16px; border-radius:var(--r-sm);
+  border:1.5px solid var(--border); background:var(--bg);
+  font-family:'Manrope',sans-serif; font-size:15px; font-weight:600;
+  outline:none; transition:border-color 0.2s;
+}
+.input-group input:focus, .input-group select:focus { border-color:var(--blue); }
+
+/* Pill row */
+.pill-row { display:flex; gap:8px; flex-wrap:wrap; }
+.pill {
+  padding:6px 14px; border-radius:50px; font-size:12px; font-weight:700;
+  border:1.5px solid var(--border); background:white; cursor:pointer;
+  transition:all 0.2s; color:var(--text-muted);
+  font-family:'Manrope',sans-serif;
+}
+.pill.active { background:var(--blue); border-color:var(--blue); color:white; }
+
+/* ===== LANDING FOOTER ===== */
+.landing-footer {
+  border-top: 1px solid rgba(255,255,255,0.08);
+  padding: 32px 48px;
+  display:flex; justify-content:space-between; align-items:center;
+  color: rgba(255,255,255,0.4); font-size:13px; flex-wrap:wrap; gap:12px;
+}
+
+/* RESPONSIVE */
+@media (max-width:768px) {
+  .landing-nav { padding:16px 20px; }
+  .nav-links { display:none; }
+  .hero { padding:48px 20px 60px; }
+  .section { padding:60px 20px; }
+  .landing-cta { padding:48px 24px; }
+  .landing-footer { padding:24px 20px; flex-direction:column; text-align:center; }
+  .comparison-table th, .comparison-table td { padding:10px 12px; font-size:12px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ========== LANDING PAGE ========== -->
+<div id="page-landing" class="page active">
+
+  <nav class="landing-nav">
+    <div class="logo">ТАН</div>
+    <div class="nav-links">
+      <a href="#">Возможности</a>
+      <a href="#">Как работает</a>
+      <a href="#">Сравнение</a>
+      <a href="#">О нас</a>
+    </div>
+    <div style="display:flex;gap:10px;">
+      <button class="btn btn-outline" onclick="openApp()">Войти</button>
+      <button class="btn btn-white" onclick="openApp()">Начать бесплатно</button>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-badge"><span></span>🏆 Финалист AWBK 2026 — Алматы</div>
+    <h1>Финансовый автопилот<br>для Казахстана</h1>
+    <p>Управляйте долгами, планируйте бюджет и достигайте финансовых целей. Создано для казахстанского рынка: Kaspi, Halyk, Forte в одном приложении.</p>
+    <div class="hero-cta">
+      <button class="btn btn-white" onclick="openApp()" style="font-size:16px;padding:16px 36px;">
+        🚀 Открыть приложение
+      </button>
+      <button class="btn btn-outline" onclick="document.querySelector('.problems-grid').scrollIntoView({behavior:'smooth'})">
+        Узнать больше ↓
+      </button>
+    </div>
+
+    <div class="hero-stats">
+      <div class="hero-stat"><div class="num">₸2.4 трлн</div><div class="label">Долги физ. лиц в РК</div></div>
+      <div class="hero-stat"><div class="num">67%</div><div class="label">Казахстанцев живут от зп до зп</div></div>
+      <div class="hero-stat"><div class="num">3.2×</div><div class="label">Снижение стресса у пользователей</div></div>
+    </div>
+
+    <!-- Mini App Preview -->
+    <div class="hero-preview">
+      <div class="preview-screen">
+        <div class="preview-header">
+          <div><div class="greeting">Доброе утро 👋</div><div class="name">Айгерим А.</div></div>
+          <div style="background:#e8effc;border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-weight:800;color:var(--blue);font-size:13px;">А</div>
+        </div>
+        <div class="preview-gauge-wrap">
+          <div class="preview-gauge"></div>
+          <div class="preview-stress">4.2</div>
+          <div class="preview-stress-label">Индекс стресса</div>
+        </div>
+        <div class="preview-cards">
+          <div class="preview-card"><div class="pc-label">Подушка безопасности</div><div class="pc-val green">2.3 мес</div></div>
+          <div class="preview-card"><div class="pc-label">Общий баланс</div><div class="pc-val">₸ 1.24М</div></div>
+          <div class="preview-card"><div class="pc-label">Долги</div><div class="pc-val red">₸ 890К</div></div>
+          <div class="preview-card"><div class="pc-label">Бюджет на месяц</div><div class="pc-val">₸ 340К</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROBLEMS -->
+  <section class="section" id="problems">
+    <h2 class="section-title">Долговая ловушка Казахстана</h2>
+    <p class="section-sub">Три причины, почему казахстанцы застревают в долгах</p>
+    <div class="problems-grid">
+      <div class="problem-card">
+        <div class="icon">🏦</div>
+        <h3>Банки скрывают реальную стоимость</h3>
+        <p>Kaspi предлагает «0% рассрочку», но ГЭСВ (годовая эффективная ставка) часто достигает 40–80%. Заёмщики не видят полную картину.</p>
+        <div class="tag">↑ 34% заёмщиков не знают свой ГЭСВ</div>
+      </div>
+      <div class="problem-card">
+        <div class="icon">💸</div>
+        <h3>Деньги «утекают» незаметно</h3>
+        <p>P2P переводы, подписки и «мелкие» покупки в Kaspi составляют в среднем 28% бюджета. Без учёта — невозможно контролировать.</p>
+        <div class="tag">↑ ₸45 000 тенге теряется ежемесячно</div>
+      </div>
+      <div class="problem-card">
+        <div class="icon">😰</div>
+        <h3>Нет инструментов планирования</h3>
+        <p>YNAB стоит $130/год и не знает о Kaspi Gold. Credit Karma работает только для США. Казахстанцы остаются без финансового советника.</p>
+        <div class="tag">↑ 0 локальных аналогов существует</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SOLUTION -->
+  <section class="section" style="background:rgba(255,255,255,0.03);">
+    <h2 class="section-title">Как работает ТАН?</h2>
+    <p class="section-sub">Три шага к финансовой свободе</p>
+    <div class="solution-steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <h3>Финансовый квиз</h3>
+        <p>За 5 минут мы оцениваем ваш Индекс Финансового Стресса (1–10), анализируем долги и доходы. Никаких банковских паролей.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <h3>Конверты «Қалта»</h3>
+        <p>Распределяйте зарплату по цифровым конвертам: Обязательные платежи, Цели, Гибкие расходы, Инвестиции. Визуально и понятно.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <h3>Навигатор долгов</h3>
+        <p>Сценарии «что если»: увеличьте платёж на ₸10 000 и узнайте, на сколько месяцев сократится срок кредита. Реальные цифры.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- COMPARISON TABLE -->
+  <section class="section">
+    <h2 class="section-title">ТАН vs Банки vs Аналоги</h2>
+    <p class="section-sub">Почему мы лучше существующих решений</p>
+    <div class="comparison-wrap">
+      <table class="comparison-table">
+        <thead>
+          <tr>
+            <th>Функция</th>
+            <th class="highlight">🇰🇿 ТАН</th>
+            <th>Kaspi App</th>
+            <th>YNAB</th>
+            <th>Ваш банк</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td class="feature">Индекс финансового стресса</td><td class="check">✓</td><td class="cross">—</td><td class="cross">—</td><td class="cross">—</td></tr>
+          <tr><td class="feature">Система конвертов (Қалта)</td><td class="check">✓</td><td class="cross">—</td><td class="check">✓</td><td class="cross">—</td></tr>
+          <tr><td class="feature">Сценарии погашения долга</td><td class="check">✓</td><td class="cross">—</td><td class="cross">—</td><td class="cross">—</td></tr>
+          <tr><td class="feature">Интеграция Kaspi/Halyk/Forte</td><td class="check">✓</td><td class="cross">Только Kaspi</td><td class="cross">—</td><td class="cross">Только свой</td></tr>
+          <tr><td class="feature">Язык интерфейса (каз/рус)</td><td class="check">✓</td><td class="check">✓</td><td class="cross">Только EN</td><td class="check">✓</td></tr>
+          <tr><td class="feature">P2P-переводы как категория</td><td class="check">✓</td><td class="cross">—</td><td class="cross">—</td><td class="cross">—</td></tr>
+          <tr><td class="feature">Подушка безопасности (месяцы)</td><td class="check">✓</td><td class="cross">—</td><td class="cross">—</td><td class="cross">—</td></tr>
+          <tr><td class="feature">Стоимость</td><td style="color:var(--green);font-weight:700">Бесплатно</td><td style="color:var(--green);font-weight:700">Бесплатно</td><td style="color:#ff7675;font-weight:700">$130/год</td><td style="color:var(--green);font-weight:700">Бесплатно</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="section">
+    <div class="landing-cta">
+      <h2>Начните бесплатно сегодня</h2>
+      <p>Присоединитесь к 2 400+ казахстанцам, которые уже управляют своими финансами с ТАН</p>
+      <button class="btn btn-white" onclick="openApp()" style="font-size:17px;padding:18px 48px;margin:0 auto;">
+        🚀 Открыть приложение — это бесплатно
+      </button>
+      <div style="margin-top:24px;font-size:12px;opacity:0.4;">Без регистрации · Демо-данные уже загружены · Для конкурса AWBK 2026</div>
+    </div>
+  </section>
+
+  <footer class="landing-footer">
+    <div class="logo">ТАН</div>
+    <div>© 2026 ТАН — Финансовый Автопилот. Прототип для AWBK</div>
+    <div style="display:flex;gap:20px;">
+      <a href="#" style="color:rgba(255,255,255,0.4);text-decoration:none;">Политика</a>
+      <a href="#" style="color:rgba(255,255,255,0.4);text-decoration:none;">Условия</a>
+    </div>
+  </footer>
+</div>
+
+<!-- ========== APP ========== -->
+<div id="page-app" class="page">
+
+  <!-- Header -->
+  <div class="app-header">
+    <div class="logo">ТАН</div>
+    <div class="greeting-wrap">
+      <div class="greeting-name">Айгерим Асанова</div>
+      <div class="greeting-sub">Воскресенье, 15 марта 2026</div>
+    </div>
+    <div class="app-avatar">А</div>
+  </div>
+
+  <!-- HOME TAB -->
+  <div id="tab-home" class="tab-content active" style="padding-top:8px;">
+
+    <!-- FSI Gauge -->
+    <div class="card fsi-card animate animate-1">
+      <div class="fsi-title">Индекс Финансового Стресса</div>
+      <div class="gauge-container">
+        <svg class="gauge-svg" viewBox="0 0 200 110">
+          <defs>
+            <linearGradient id="gaugeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" style="stop-color:#2ECC71"/>
+              <stop offset="50%" style="stop-color:#F39C12"/>
+              <stop offset="100%" style="stop-color:#E74C3C"/>
+            </linearGradient>
+          </defs>
+          <!-- Background arc -->
+          <path d="M 20 100 A 80 80 0 0 1 180 100" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="16" stroke-linecap="round"/>
+          <!-- Colored arc -->
+          <path id="fsi-arc" d="M 20 100 A 80 80 0 0 1 180 100" fill="none" stroke="url(#gaugeGrad)" stroke-width="16" stroke-linecap="round" stroke-dasharray="252" stroke-dashoffset="100"/>
+          <!-- Needle -->
+          <line id="fsi-needle" x1="100" y1="100" x2="100" y2="28" stroke="white" stroke-width="3" stroke-linecap="round" transform="rotate(-33, 100, 100)"/>
+          <circle cx="100" cy="100" r="6" fill="white"/>
+        </svg>
+        <div class="gauge-value-wrap">
+          <div class="gauge-value">4.2</div>
+          <div class="gauge-label">из 10</div>
+        </div>
+      </div>
+      <div style="font-size:13px;opacity:0.75;margin-bottom:12px;">🟢 Умеренный стресс — вы на правильном пути!</div>
+      <div class="fsi-meta">
+        <div class="fsi-meta-item"><div class="val">2.3</div><div class="lbl">Месяца подушки</div></div>
+        <div class="fsi-meta-item"><div class="val">38%</div><div class="lbl">Долг от дохода</div></div>
+        <div class="fsi-meta-item"><div class="val">₸42К</div><div class="lbl">Свободно</div></div>
+      </div>
+    </div>
+
+    <!-- Accounts -->
+    <p class="section-label">Счета</p>
+    <div class="accounts-row animate animate-2">
+      <div class="account-card kaspi">
+        <div class="bank-icon">♠️</div>
+        <div class="bank-name">Kaspi Gold</div>
+        <div class="bank-bal">₸ 542 800</div>
+        <div class="bank-num">**** 4821</div>
+      </div>
+      <div class="account-card halyk">
+        <div class="bank-icon">🌿</div>
+        <div class="bank-name">Halyk Bank</div>
+        <div class="bank-bal">₸ 381 200</div>
+        <div class="bank-num">**** 7703</div>
+      </div>
+      <div class="account-card forte">
+        <div class="bank-icon">💜</div>
+        <div class="bank-name">Forte Bank</div>
+        <div class="bank-bal">₸ 316 500</div>
+        <div class="bank-num">**** 0092</div>
+      </div>
+    </div>
+
+    <!-- Cushion -->
+    <p class="section-label">Подушка безопасности</p>
+    <div class="card cushion-card animate animate-3">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+        <div>
+          <div class="cushion-months">2.3</div>
+          <div class="cushion-label">месяца выживания</div>
+          <div style="font-size:12px;color:var(--text-muted);margin-top:6px;">Цель: 6 месяцев · Осталось накопить ₸ 435 000</div>
+        </div>
+        <div class="badge badge-orange">⚠ Низкая</div>
+      </div>
+      <div class="cushion-bar"><div class="cushion-fill" style="width:38%"></div></div>
+      <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text-muted);margin-top:6px;">
+        <span>₸ 0</span><span>Сейчас: ₸ 245 000</span><span>Цель: ₸ 680 000</span>
+      </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <p class="section-label">Этот месяц</p>
+    <div class="quick-stats animate animate-4">
+      <div class="qstat">
+        <div class="qs-label">💰 Доходы</div>
+        <div class="qs-val up">₸ 380 000</div>
+        <div class="qs-change" style="color:var(--green-dark);">↑ +12% vs прошлый</div>
+      </div>
+      <div class="qstat">
+        <div class="qs-label">💸 Расходы</div>
+        <div class="qs-val down">₸ 338 000</div>
+        <div class="qs-change" style="color:var(--red);">↓ -8% vs прошлый</div>
+      </div>
+      <div class="qstat">
+        <div class="qs-label">🏦 Кредиты</div>
+        <div class="qs-val down">₸ 145 000</div>
+        <div class="qs-change" style="color:var(--text-muted);">3 активных кредита</div>
+      </div>
+      <div class="qstat">
+        <div class="qs-label">📈 Накопления</div>
+        <div class="qs-val up">₸ 42 000</div>
+        <div class="qs-change" style="color:var(--green-dark);">↑ +₸5 000 vs план</div>
+      </div>
+    </div>
+
+    <!-- Transactions -->
+    <p class="section-label">Последние операции</p>
+    <div class="card animate animate-5">
+      <div class="tx-item">
+        <div class="tx-icon" style="background:#fef2f2;">🛒</div>
+        <div class="tx-info"><div class="tx-name">Magnum SuperStore</div><div class="tx-cat">Продукты · Kaspi QR</div></div>
+        <div class="tx-amt neg">−₸ 12 400</div>
+      </div>
+      <div class="tx-item">
+        <div class="tx-icon" style="background:#f0fdf4;">💸</div>
+        <div class="tx-info"><div class="tx-name">P2P → Дана К.</div><div class="tx-cat">P2P-перевод · Kaspi</div></div>
+        <div class="tx-amt neg">−₸ 8 000</div>
+      </div>
+      <div class="tx-item">
+        <div class="tx-icon" style="background:#eff6ff;">💼</div>
+        <div class="tx-info"><div class="tx-name">Зарплата</div><div class="tx-cat">Доход · Halyk зачисление</div></div>
+        <div class="tx-amt pos">+₸ 380 000</div>
+      </div>
+      <div class="tx-item">
+        <div class="tx-icon" style="background:#fef3c7;">⛽</div>
+        <div class="tx-info"><div class="tx-name">Sinooil АЗС</div><div class="tx-cat">Авто · Forte карта</div></div>
+        <div class="tx-amt neg">−₸ 6 800</div>
+      </div>
+      <div class="tx-item">
+        <div class="tx-icon" style="background:#fdf4ff;">📱</div>
+        <div class="tx-info"><div class="tx-name">Kaspi Кредит платёж</div><div class="tx-cat">Обязательный · Авто-списание</div></div>
+        <div class="tx-amt neg">−₸ 45 000</div>
+      </div>
+    </div>
+
+    <!-- P2P Section -->
+    <p class="section-label">P2P-переводы за месяц</p>
+    <div class="card animate animate-5">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+        <div style="font-size:13px;color:var(--text-muted);">Общая сумма</div>
+        <div style="font-size:20px;font-weight:800;color:var(--red);">₸ 43 500</div>
+      </div>
+      <div class="p2p-grid">
+        <div class="p2p-item">
+          <div class="p2p-avatar">Д</div>
+          <div style="flex:1"><div class="p2p-name">Дана К.</div><div class="p2p-date">14 мар</div></div>
+          <div class="p2p-amt">₸8 000</div>
+        </div>
+        <div class="p2p-item">
+          <div class="p2p-avatar" style="background:linear-gradient(135deg,var(--purple),#6c3483)">М</div>
+          <div style="flex:1"><div class="p2p-name">Мама</div><div class="p2p-date">10 мар</div></div>
+          <div class="p2p-amt">₸20 000</div>
+        </div>
+        <div class="p2p-item">
+          <div class="p2p-avatar" style="background:linear-gradient(135deg,var(--green-dark),#1e8449)">Б</div>
+          <div style="flex:1"><div class="p2p-name">Болат Е.</div><div class="p2p-date">8 мар</div></div>
+          <div class="p2p-amt">₸5 500</div>
+        </div>
+        <div class="p2p-item">
+          <div class="p2p-avatar" style="background:linear-gradient(135deg,var(--orange),#d35400)">З</div>
+          <div style="flex:1"><div class="p2p-name">Зарина</div><div class="p2p-date">5 мар</div></div>
+          <div class="p2p-amt">₸10 000</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- BUDGET TAB -->
+  <div id="tab-budget" class="tab-content">
+
+    <!-- Money Meeting -->
+    <div class="meeting-card animate animate-1">
+      <div class="meeting-header">
+        <div>
+          <div class="meeting-title">💰 Денежная встреча</div>
+          <div style="font-size:11px;opacity:0.5;margin-top:2px;">Распределите зарплату по конвертам</div>
+        </div>
+        <div class="meeting-badge">Март 2026</div>
+      </div>
+
+      <div style="text-align:center;margin-bottom:16px;">
+        <div style="font-size:11px;opacity:0.5;text-transform:uppercase;letter-spacing:0.1em;">Зарплата</div>
+        <div style="font-size:36px;font-weight:900;" id="salary-display">₸ 380 000</div>
+      </div>
+
+      <div class="slider-group">
+        <div class="slider-label">
+          <span>🔴 Обязательные (Кредиты, ЖКХ)</span>
+          <span id="red-val">₸ 152 000</span>
+        </div>
+        <input type="range" class="red-slider" min="0" max="100" value="40" id="red-slider" oninput="updateSliders()">
+      </div>
+      <div class="slider-group">
+        <div class="slider-label">
+          <span>🟢 Цели (Накопления)</span>
+          <span id="green-val">₸ 95 000</span>
+        </div>
+        <input type="range" class="green-slider" min="0" max="100" value="25" id="green-slider" oninput="updateSliders()">
+      </div>
+      <div class="slider-group">
+        <div class="slider-label">
+          <span>🔵 Гибкие (Еда, Развлечения)</span>
+          <span id="blue-val">₸ 76 000</span>
+        </div>
+        <input type="range" class="blue-slider" min="0" max="100" value="20" id="blue-slider" oninput="updateSliders()">
+      </div>
+      <div class="slider-group">
+        <div class="slider-label">
+          <span>🟣 Инвестиции</span>
+          <span id="purple-val">₸ 57 000</span>
+        </div>
+        <input type="range" class="purple-slider" min="0" max="100" value="15" id="purple-slider" oninput="updateSliders()">
+      </div>
+
+      <div class="remaining-bar">
+        <span class="label">Нераспределено</span>
+        <span class="val" id="remaining-val">₸ 0</span>
+      </div>
+    </div>
+
+    <!-- Envelopes -->
+    <p class="section-label">Конверты «Қалта»</p>
+    <div class="envelopes-grid animate animate-2">
+      <div class="envelope red" onclick="openEnvModal('red')">
+        <div class="env-label">🔴 Обязательные</div>
+        <div class="env-name">Кредиты и ЖКХ</div>
+        <div class="env-amount" id="env-red-amt">₸ 152 000</div>
+        <div class="env-bar"><div class="env-fill" id="env-red-fill" style="width:78%"></div></div>
+        <div class="env-sub">Потрачено: ₸ 118 500 / ₸ 152 000</div>
+      </div>
+      <div class="envelope green" onclick="openEnvModal('green')">
+        <div class="env-label">🟢 Цели</div>
+        <div class="env-name">Накопления</div>
+        <div class="env-amount" id="env-green-amt">₸ 95 000</div>
+        <div class="env-bar"><div class="env-fill" id="env-green-fill" style="width:44%"></div></div>
+        <div class="env-sub">Отложено: ₸ 42 000 / ₸ 95 000</div>
+      </div>
+      <div class="envelope blue" onclick="openEnvModal('blue')">
+        <div class="env-label">🔵 Гибкие</div>
+        <div class="env-name">Еда и досуг</div>
+        <div class="env-amount" id="env-blue-amt">₸ 76 000</div>
+        <div class="env-bar"><div class="env-fill" id="env-blue-fill" style="width:61%"></div></div>
+        <div class="env-sub">Потрачено: ₸ 46 200 / ₸ 76 000</div>
+      </div>
+      <div class="envelope purple" onclick="openEnvModal('purple')">
+        <div class="env-label">🟣 Инвестиции</div>
+        <div class="env-name">Freedom Finance</div>
+        <div class="env-amount" id="env-purple-amt">₸ 57 000</div>
+        <div class="env-bar"><div class="env-fill" id="env-purple-fill" style="width:18%"></div></div>
+        <div class="env-sub">Инвестировано: ₸ 10 000 / ₸ 57 000</div>
+      </div>
+    </div>
+
+    <!-- Budget categories breakdown -->
+    <p class="section-label">Топ расходы этого месяца</p>
+    <div class="card animate animate-3">
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px;">
+            <span>🏦 Кредиты</span><span style="font-weight:700;">₸ 145 000 <span style="color:var(--text-muted);font-weight:400;">(38%)</span></span>
+          </div>
+          <div style="height:6px;background:#f1f5f9;border-radius:99px;overflow:hidden;"><div style="width:38%;height:100%;background:var(--red);border-radius:99px;"></div></div>
+        </div>
+        <div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px;">
+            <span>🛒 Продукты</span><span style="font-weight:700;">₸ 68 000 <span style="color:var(--text-muted);font-weight:400;">(18%)</span></span>
+          </div>
+          <div style="height:6px;background:#f1f5f9;border-radius:99px;overflow:hidden;"><div style="width:18%;height:100%;background:var(--blue);border-radius:99px;"></div></div>
+        </div>
+        <div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px;">
+            <span>💸 P2P-переводы</span><span style="font-weight:700;">₸ 43 500 <span style="color:var(--text-muted);font-weight:400;">(11%)</span></span>
+          </div>
+          <div style="height:6px;background:#f1f5f9;border-radius:99px;overflow:hidden;"><div style="width:11%;height:100%;background:var(--orange);border-radius:99px;"></div></div>
+        </div>
+        <div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px;">
+            <span>⛽ Авто/транспорт</span><span style="font-weight:700;">₸ 32 000 <span style="color:var(--text-muted);font-weight:400;">(8%)</span></span>
+          </div>
+          <div style="height:6px;background:#f1f5f9;border-radius:99px;overflow:hidden;"><div style="width:8%;height:100%;background:var(--purple);border-radius:99px;"></div></div>
+        </div>
+        <div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px;">
+            <span>🍽 Рестораны/кафе</span><span style="font-weight:700;">₸ 24 800 <span style="color:var(--text-muted);font-weight:400;">(7%)</span></span>
+          </div>
+          <div style="height:6px;background:#f1f5f9;border-radius:99px;overflow:hidden;"><div style="width:7%;height:100%;background:var(--green);border-radius:99px;"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DEBTS TAB -->
+  <div id="tab-debts" class="tab-content">
+
+    <!-- Total debt -->
+    <div class="total-debt-card animate animate-1">
+      <div class="total-debt-label">Общий долг</div>
+      <div class="total-debt-amount">₸ 2 485 000</div>
+      <div class="total-debt-sub">Ежемесячный платёж: ₸ 145 000 · Средний ГЭСВ: 24.6%</div>
+      <div class="debt-meta">
+        <div class="debt-meta-item"><div class="v">3</div><div class="l">Кредита</div></div>
+        <div class="debt-meta-item"><div class="v">22 мес</div><div class="l">До погашения</div></div>
+        <div class="debt-meta-item"><div class="v">₸487К</div><div class="l">Переплата %</div></div>
+      </div>
+    </div>
+
+    <!-- Debt list -->
+    <p class="section-label">Активные кредиты</p>
+
+    <div class="debt-card kaspi-red animate animate-2" onclick="openDebtModal('kaspi')">
+      <div class="debt-header">
+        <div>
+          <div class="debt-name">♠️ Kaspi Рассрочка</div>
+          <div style="display:flex;gap:6px;margin-top:4px;">
+            <span class="badge badge-red">ГЭСВ: 29%</span>
+            <span class="badge badge-orange">Приоритет 1</span>
+          </div>
+        </div>
+        <div class="debt-rate">₸ 950 000</div>
+      </div>
+      <div class="debt-row"><span class="dl">Ежемес. платёж</span><span class="dv">₸ 65 000</span></div>
+      <div class="debt-row"><span class="dl">Осталось платежей</span><span class="dv">14 мес</span></div>
+      <div class="debt-row"><span class="dl">Переплата %</span><span class="dv" style="color:var(--red)">₸ 264 000</span></div>
+      <div class="debt-progress"><div class="debt-fill" style="width:38%"></div></div>
+      <div style="font-size:10px;color:var(--text-muted);margin-top:4px;">Оплачено: 38% · ₸ 580 000 из ₸ 1 530 000</div>
+    </div>
+
+    <div class="debt-card halyk-green animate animate-3" onclick="openDebtModal('halyk')">
+      <div class="debt-header">
+        <div>
+          <div class="debt-name">🌿 Halyk Авто-кредит</div>
+          <div style="display:flex;gap:6px;margin-top:4px;">
+            <span class="badge badge-green">ГЭСВ: 18%</span>
+            <span class="badge badge-blue">Приоритет 2</span>
+          </div>
+        </div>
+        <div class="debt-rate" style="color:var(--green-dark)">₸ 1 200 000</div>
+      </div>
+      <div class="debt-row"><span class="dl">Ежемес. платёж</span><span class="dv">₸ 52 000</span></div>
+      <div class="debt-row"><span class="dl">Осталось платежей</span><span class="dv">24 мес</span></div>
+      <div class="debt-row"><span class="dl">Переплата %</span><span class="dv" style="color:var(--red)">₸ 189 000</span></div>
+      <div class="debt-progress"><div class="debt-fill" style="width:55%"></div></div>
+      <div style="font-size:10px;color:var(--text-muted);margin-top:4px;">Оплачено: 55% · ₸ 1 480 000 из ₸ 2 680 000</div>
+    </div>
+
+    <div class="debt-card forte-purple animate animate-4" onclick="openDebtModal('forte')">
+      <div class="debt-header">
+        <div>
+          <div class="debt-name">💜 Forte Потреб. кредит</div>
+          <div style="display:flex;gap:6px;margin-top:4px;">
+            <span class="badge" style="background:#fdf4ff;color:var(--purple)">ГЭСВ: 24%</span>
+            <span class="badge badge-blue">Приоритет 3</span>
+          </div>
+        </div>
+        <div class="debt-rate" style="color:var(--purple)">₸ 335 000</div>
+      </div>
+      <div class="debt-row"><span class="dl">Ежемес. платёж</span><span class="dv">₸ 28 000</span></div>
+      <div class="debt-row"><span class="dl">Осталось платежей</span><span class="dv">12 мес</span></div>
+      <div class="debt-row"><span class="dl">Переплата %</span><span class="dv" style="color:var(--red)">₸ 34 000</span></div>
+      <div class="debt-progress"><div class="debt-fill" style="width:72%"></div></div>
+      <div style="font-size:10px;color:var(--text-muted);margin-top:4px;">Оплачено: 72% · ₸ 875 000 из ₸ 1 210 000</div>
+    </div>
+
+    <!-- Payoff strategy -->
+    <p class="section-label">Стратегия погашения</p>
+    <div class="card animate animate-5">
+      <div style="display:flex;gap:8px;margin-bottom:16px;" id="strategy-pills">
+        <button class="pill active" onclick="selectStrategy(this,'avalanche')">❄️ Лавина</button>
+        <button class="pill" onclick="selectStrategy(this,'snowball')">⛄ Снежный ком</button>
+        <button class="pill" onclick="selectStrategy(this,'hybrid')">🎯 Гибрид</button>
+      </div>
+      <div id="strategy-desc" style="font-size:13px;line-height:1.7;color:var(--text-muted);">
+        <strong style="color:var(--text);">❄️ Метод Лавины</strong> — погашайте сначала кредит с наибольшей ставкой (Kaspi 29%). Это математически оптимально и сэкономит вам <strong style="color:var(--green-dark);">₸ 87 000</strong> на процентах по сравнению с минимальными платежами.
+      </div>
+    </div>
+
+  </div>
+
+  <!-- FUTURE TAB -->
+  <div id="tab-future" class="tab-content">
+
+    <!-- What-if tool -->
+    <div class="scenario-card animate animate-1">
+      <div class="scenario-title">🔮 Сценарии «Что Если»</div>
+      <div class="scenario-sub">Увеличьте платёж и увидьте, сколько сэкономите</div>
+
+      <div class="debt-selector">
+        <button class="debt-sel-btn selected" onclick="selectDebt(this,'kaspi')">♠️ Kaspi</button>
+        <button class="debt-sel-btn" onclick="selectDebt(this,'halyk')">🌿 Halyk</button>
+        <button class="debt-sel-btn" onclick="selectDebt(this,'forte')">💜 Forte</button>
+      </div>
+
+      <div class="extra-payment">
+        <div class="extra-label">Доп. сумма платежа в месяц:</div>
+        <div class="extra-amount" id="extra-display">+ ₸ 15 000</div>
+        <input type="range" class="extra-slider" min="0" max="100" value="30" id="extra-slider" style="--val:30%;" oninput="updateScenario(this.value)">
+        <div style="display:flex;justify-content:space-between;font-size:11px;opacity:0.4;margin-top:4px;">
+          <span>₸ 0</span><span>₸ 50 000</span>
+        </div>
+      </div>
+
+      <div class="scenario-result" id="scenario-result">
+        <div class="sr-box">
+          <div class="sr-label">Срок сейчас</div>
+          <div class="sr-val red" id="sr-current">14 мес</div>
+        </div>
+        <div class="sr-box">
+          <div class="sr-label">Новый срок</div>
+          <div class="sr-val green" id="sr-new">11 мес</div>
+        </div>
+        <div class="sr-box">
+          <div class="sr-label">Экономия %</div>
+          <div class="sr-val green" id="sr-interest">₸ 48 000</div>
+        </div>
+        <div class="sr-box">
+          <div class="sr-label">Выгода</div>
+          <div class="sr-val green" id="sr-months">−3 мес</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Timeline -->
+    <p class="section-label">Временная линия погашения</p>
+
+    <div class="timeline-card animate animate-2">
+      <div class="timeline-header">
+        <div class="timeline-title">♠️ Kaspi Рассрочка</div>
+        <div class="timeline-pill saving">−3 мес с ТАН</div>
+      </div>
+      <div style="font-size:12px;color:var(--text-muted);margin-bottom:8px;">Без изменений: май 2027 · С ТАН: <strong style="color:var(--green-dark)">февраль 2027</strong></div>
+      <div style="position:relative;height:10px;background:#f1f5f9;border-radius:99px;overflow:hidden;">
+        <div style="position:absolute;top:0;left:0;width:100%;height:100%;background:#fecaca;border-radius:99px;"></div>
+        <div id="tl-kaspi" style="position:absolute;top:0;left:0;width:79%;height:100%;background:var(--green);border-radius:99px;transition:width 0.8s;"></div>
+      </div>
+      <div style="font-size:10px;color:var(--text-muted);margin-top:4px;">С доп. платежом ₸15 000 → закроется в феврале 2027</div>
+    </div>
+
+    <div class="timeline-card animate animate-3">
+      <div class="timeline-header">
+        <div class="timeline-title">🌿 Halyk Авто-кредит</div>
+        <div class="timeline-pill normal">Без изменений</div>
+      </div>
+      <div style="font-size:12px;color:var(--text-muted);margin-bottom:8px;">Текущий срок: март 2028</div>
+      <div style="position:relative;height:10px;background:#f1f5f9;border-radius:99px;overflow:hidden;">
+        <div style="position:absolute;top:0;left:0;width:55%;height:100%;background:var(--green);border-radius:99px;"></div>
+      </div>
+      <div style="font-size:10px;color:var(--text-muted);margin-top:4px;">55% оплачено · Осталось 24 платежа</div>
+    </div>
+
+    <!-- Financial goals -->
+    <p class="section-label">Финансовые цели</p>
+    <div class="card animate animate-4">
+      <div style="display:flex;flex-direction:column;gap:14px;">
+        <div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+            <div><div style="font-size:14px;font-weight:700;">🏠 Первоначальный взнос</div><div style="font-size:11px;color:var(--text-muted)">Цель: ₸ 3 000 000</div></div>
+            <div style="text-align:right;"><div style="font-size:16px;font-weight:800;color:var(--blue)">₸ 245 000</div><div style="font-size:10px;color:var(--text-muted)">8.2%</div></div>
+          </div>
+          <div style="height:8px;background:#f1f5f9;border-radius:99px;overflow:hidden;"><div style="width:8.2%;height:100%;background:var(--blue);border-radius:99px;"></div></div>
+          <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">При ₸42К/мес — через 66 месяцев (2031 г.)</div>
+        </div>
+        <div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+            <div><div style="font-size:14px;font-weight:700;">🛡 Подушка безопасности</div><div style="font-size:11px;color:var(--text-muted)">Цель: ₸ 680 000</div></div>
+            <div style="text-align:right;"><div style="font-size:16px;font-weight:800;color:var(--green-dark)">₸ 245 000</div><div style="font-size:10px;color:var(--text-muted)">36%</div></div>
+          </div>
+          <div style="height:8px;background:#f1f5f9;border-radius:99px;overflow:hidden;"><div style="width:36%;height:100%;background:var(--green);border-radius:99px;"></div></div>
+          <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">При ₸42К/мес — через 10 месяцев (январь 2027)</div>
+        </div>
+        <div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+            <div><div style="font-size:14px;font-weight:700;">✈️ Отпуск (Таиланд)</div><div style="font-size:11px;color:var(--text-muted)">Цель: ₸ 400 000</div></div>
+            <div style="text-align:right;"><div style="font-size:16px;font-weight:800;color:var(--purple)">₸ 80 000</div><div style="font-size:10px;color:var(--text-muted)">20%</div></div>
+          </div>
+          <div style="height:8px;background:#f1f5f9;border-radius:99px;overflow:hidden;"><div style="width:20%;height:100%;background:var(--purple);border-radius:99px;"></div></div>
+          <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">При ₸20К/мес — через 16 месяцев (июль 2027)</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- BOTTOM NAV -->
+  <nav class="bottom-nav">
+    <button class="nav-tab active" onclick="switchTab('home',this)">
+      <span class="nav-icon">🏠</span><span>Главная</span>
+    </button>
+    <button class="nav-tab" onclick="switchTab('budget',this)">
+      <span class="nav-icon">👛</span><span>Бюджет</span>
+    </button>
+    <button class="nav-tab" onclick="switchTab('debts',this)">
+      <span class="nav-icon">💳</span><span>Долги</span>
+    </button>
+    <button class="nav-tab" onclick="switchTab('future',this)">
+      <span class="nav-icon">🔮</span><span>Будущее</span>
+    </button>
+  </nav>
+</div>
+
+<!-- Envelope Modal -->
+<div class="modal-overlay" id="env-modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('env-modal')">×</button>
+    <h3 id="env-modal-title">Конверт</h3>
+    <div id="env-modal-body"></div>
+    <button class="btn btn-primary" style="width:100%;justify-content:center;margin-top:8px;" onclick="closeModal('env-modal')">Сохранить</button>
+  </div>
+</div>
+
+<!-- Debt Modal -->
+<div class="modal-overlay" id="debt-modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('debt-modal')">×</button>
+    <h3 id="debt-modal-title">Кредит</h3>
+    <div id="debt-modal-body"></div>
+    <button class="btn btn-primary" style="width:100%;justify-content:center;margin-top:8px;" onclick="closeModal('debt-modal')">Закрыть</button>
+  </div>
+</div>
+
+<script>
+// ===== NAVIGATION =====
+function openApp() {
+  document.getElementById('page-landing').classList.remove('active');
+  document.getElementById('page-app').classList.add('active');
+  window.scrollTo(0,0);
+}
+
+function switchTab(tab, btn) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-'+tab).classList.add('active');
+  btn.classList.add('active');
+  window.scrollTo(0,0);
+}
+
+// ===== SLIDERS =====
+const salary = 380000;
+function updateSliders() {
+  const r = parseInt(document.getElementById('red-slider').value);
+  const g = parseInt(document.getElementById('green-slider').value);
+  const b = parseInt(document.getElementById('blue-slider').value);
+  const p = parseInt(document.getElementById('purple-slider').value);
+  const total = r + g + b + p;
+
+  document.getElementById('red-val').textContent = '₸ ' + Math.round(salary*r/100).toLocaleString('ru-RU');
+  document.getElementById('green-val').textContent = '₸ ' + Math.round(salary*g/100).toLocaleString('ru-RU');
+  document.getElementById('blue-val').textContent = '₸ ' + Math.round(salary*b/100).toLocaleString('ru-RU');
+  document.getElementById('purple-val').textContent = '₸ ' + Math.round(salary*p/100).toLocaleString('ru-RU');
+
+  const rem = salary - Math.round(salary*(r+g+b+p)/100);
+  document.getElementById('remaining-val').textContent = '₸ ' + Math.max(0,rem).toLocaleString('ru-RU');
+  document.getElementById('remaining-val').style.color = rem < 0 ? 'var(--red)' : 'var(--green)';
+
+  // Update envelope amounts
+  document.getElementById('env-red-amt').textContent = '₸ ' + Math.round(salary*r/100).toLocaleString('ru-RU');
+  document.getElementById('env-green-amt').textContent = '₸ ' + Math.round(salary*g/100).toLocaleString('ru-RU');
+  document.getElementById('env-blue-amt').textContent = '₸ ' + Math.round(salary*b/100).toLocaleString('ru-RU');
+  document.getElementById('env-purple-amt').textContent = '₸ ' + Math.round(salary*p/100).toLocaleString('ru-RU');
+
+  // Update slider CSS vars
+  document.getElementById('red-slider').style.setProperty('--val', r+'%');
+  document.getElementById('red-slider').style.background = `linear-gradient(90deg, var(--red) ${r}%, rgba(255,255,255,0.15) ${r}%)`;
+  document.getElementById('green-slider').style.background = `linear-gradient(90deg, var(--green) ${g}%, rgba(255,255,255,0.15) ${g}%)`;
+  document.getElementById('blue-slider').style.background = `linear-gradient(90deg, #3b82f6 ${b}%, rgba(255,255,255,0.15) ${b}%)`;
+  document.getElementById('purple-slider').style.background = `linear-gradient(90deg, var(--purple) ${p}%, rgba(255,255,255,0.15) ${p}%)`;
+}
+updateSliders();
+
+// ===== SCENARIO =====
+function updateScenario(val) {
+  const extra = Math.round(val * 500);
+  document.getElementById('extra-display').textContent = '+ ₸ ' + extra.toLocaleString('ru-RU');
+  document.getElementById('extra-slider').style.background = `linear-gradient(90deg, var(--green) ${val}%, rgba(255,255,255,0.15) ${val}%)`;
+
+  const currentMonths = 14;
+  const monthlyPayment = 65000;
+  const balance = 950000;
+  const rate = 0.29/12;
+
+  let newMonths = currentMonths;
+  if(extra > 0) {
+    let bal = balance;
+    let months = 0;
+    while(bal > 0 && months < 100) {
+      bal = bal * (1+rate) - monthlyPayment - extra;
+      months++;
+    }
+    newMonths = Math.max(1, months);
+  }
+
+  const savedMonths = currentMonths - newMonths;
+  const savedInterest = savedMonths * monthlyPayment * 0.35;
+
+  document.getElementById('sr-current').textContent = currentMonths + ' мес';
+  document.getElementById('sr-new').textContent = newMonths + ' мес';
+  document.getElementById('sr-interest').textContent = '₸ ' + Math.round(savedInterest).toLocaleString('ru-RU');
+  document.getElementById('sr-months').textContent = savedMonths > 0 ? '−' + savedMonths + ' мес' : '0 мес';
+
+  const tlWidth = Math.max(30, 100 - savedMonths*6);
+  const tlEl = document.getElementById('tl-kaspi');
+  if(tlEl) tlEl.style.width = tlWidth+'%';
+}
+updateScenario(30);
+
+// ===== STRATEGY =====
+function selectStrategy(btn, type) {
+  document.querySelectorAll('#strategy-pills .pill').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  const descs = {
+    avalanche: '<strong style="color:var(--text);">❄️ Метод Лавины</strong> — погашайте сначала кредит с наибольшей ставкой (Kaspi 29%). Это математически оптимально и сэкономит вам <strong style="color:var(--green-dark);">₸ 87 000</strong> на процентах по сравнению с минимальными платежами.',
+    snowball: '<strong style="color:var(--text);">⛄ Снежный ком</strong> — начните с наименьшего долга (Forte ₸335K). Быстрые победы мотивируют! После погашения Forte добавьте ₸28К к следующему кредиту. Психологический эффект доказан исследованиями.',
+    hybrid: '<strong style="color:var(--text);">🎯 Гибридный метод</strong> — сначала закройте Forte (маленький долг, психологическая победа), затем переключитесь на Kaspi (высокий %). Оптимальный баланс между мотивацией и экономией: ₸ 64 000 сэкономленных %.'
+  };
+  document.getElementById('strategy-desc').innerHTML = descs[type];
+}
+
+// ===== DEBT SELECTOR =====
+function selectDebt(btn, debt) {
+  document.querySelectorAll('.debt-sel-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  const data = {
+    kaspi:  { bal:950000,  rate:0.29, payment:65000,  months:14, name:'Kaspi' },
+    halyk:  { bal:1200000, rate:0.18, payment:52000,  months:24, name:'Halyk' },
+    forte:  { bal:335000,  rate:0.24, payment:28000,  months:12, name:'Forte' }
+  };
+  const d = data[debt];
+  document.getElementById('sr-current').textContent = d.months + ' мес';
+  updateScenario(parseInt(document.getElementById('extra-slider').value));
+}
+
+// ===== MODALS =====
+function openEnvModal(type) {
+  const data = {
+    red:    { title:'🔴 Обязательные платежи', items:['Kaspi кредит — ₸65 000','Halyk кредит — ₸52 000','Forte кредит — ₸28 000','Коммунальные — ₸12 000','Связь — ₸3 500'] },
+    green:  { title:'🟢 Цели и накопления',    items:['Подушка безопасности — ₸30 000','Первый взнос — ₸30 000','Отпуск Таиланд — ₸20 000','Авто ремонт — ₸15 000'] },
+    blue:   { title:'🔵 Гибкие расходы',       items:['Продукты — ₸25 000','Рестораны — ₸15 000','Одежда — ₸15 000','Развлечения — ₸12 000','Прочее — ₸9 000'] },
+    purple: { title:'🟣 Инвестиции',            items:['Freedom Finance ETF — ₸30 000','Kaspi облигации — ₸15 000','Наличные резерв — ₸12 000'] }
+  };
+  const d = data[type];
+  document.getElementById('env-modal-title').textContent = d.title;
+  document.getElementById('env-modal-body').innerHTML = d.items.map(i =>
+    `<div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);font-size:14px;">
+      <span>${i.split('—')[0]}</span><strong>${i.split('—')[1]||''}</strong>
+    </div>`
+  ).join('');
+  document.getElementById('env-modal').classList.add('open');
+}
+
+function openDebtModal(bank) {
+  const data = {
+    kaspi: {
+      title: '♠️ Kaspi Рассрочка — Детали',
+      body: `
+        <div style="background:#fef2f2;border-radius:12px;padding:14px;margin-bottom:14px;">
+          <div style="font-size:24px;font-weight:900;color:var(--red)">₸ 950 000</div>
+          <div style="font-size:12px;color:var(--text-muted)">Остаток долга</div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">
+          <div style="background:#f8fafc;border-radius:10px;padding:12px;"><div style="font-size:10px;color:var(--text-muted)">ГЭСВ</div><div style="font-size:18px;font-weight:800;color:var(--red)">29%</div></div>
+          <div style="background:#f8fafc;border-radius:10px;padding:12px;"><div style="font-size:10px;color:var(--text-muted)">Платёж/мес</div><div style="font-size:18px;font-weight:800">₸65 000</div></div>
+          <div style="background:#f8fafc;border-radius:10px;padding:12px;"><div style="font-size:10px;color:var(--text-muted)">Осталось</div><div style="font-size:18px;font-weight:800">14 мес</div></div>
+          <div style="background:#f8fafc;border-radius:10px;padding:12px;"><div style="font-size:10px;color:var(--text-muted)">Переплата</div><div style="font-size:18px;font-weight:800;color:var(--red)">₸264К</div></div>
+        </div>
+        <div style="font-size:13px;color:var(--text-muted);line-height:1.6;">💡 <strong>Совет ТАН:</strong> Доп. платёж ₸15 000/мес сократит срок на 3 месяца и сэкономит ₸48 000 на процентах.</div>`
+    },
+    halyk: {
+      title: '🌿 Halyk Авто-кредит — Детали',
+      body: `
+        <div style="background:#f0fdf4;border-radius:12px;padding:14px;margin-bottom:14px;">
+          <div style="font-size:24px;font-weight:900;color:var(--green-dark)">₸ 1 200 000</div>
+          <div style="font-size:12px;color:var(--text-muted)">Остаток долга</div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">
+          <div style="background:#f8fafc;border-radius:10px;padding:12px;"><div style="font-size:10px;color:var(--text-muted)">ГЭСВ</div><div style="font-size:18px;font-weight:800;color:var(--green-dark)">18%</div></div>
+          <div style="background:#f8fafc;border-radius:10px;padding:12px;"><div style="font-size:10px;color:var(--text-muted)">Платёж/мес</div><div style="font-size:18px;font-weight:800">₸52 000</div></div>
+          <div style="background:#f8fafc;border-radius:10px;padding:12px;"><div style="font-size:10px;color:var(--text-muted)">Осталось</div><div style="font-size:18px;font-weight:800">24 мес</div></div>
+          <div style="background:#f8fafc;border-radius:10px;padding:12px;"><div style="font-size:10px;color:var(--text-muted)">Залог</div><div style="font-size:18px;font-weight:800">Авто</div></div>
+        </div>
+        <div style="font-size:13px;color:var(--text-muted);line-height:1.6;">💡 <strong>Совет ТАН:</strong> Самая низкая ставка из ваших кредитов. Сначала закройте Kaspi и Forte, затем ускорьте этот.</div>`
+    },
+    forte: {
+      title: '💜 Forte Потреб. кредит — Детали',
+      body: `
+        <div style="background:#fdf4ff;border-radius:12px;padding:14px;margin-bottom:14px;">
+          <div style="font-size:24px;font-weight:900;color:var(--purple)">₸ 335 000</div>
+          <div style="font-size:12px;color:var(--text-muted)">Остаток долга</div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">
+          <div style="background:#f8fafc;border-radius:10px;padding:12px;"><div style="font-size:10px;color:var(--text-muted)">ГЭСВ</div><div style="font-size:18px;font-weight:800;color:var(--purple)">24%</div></div>
+          <div style="background:#f8fafc;border-radius:10px;padding:12px;"><div style="font-size:10px;color:var(--text-muted)">Платёж/мес</div><div style="font-size:18px;font-weight:800">₸28 000</div></div>
+          <div style="background:#f8fafc;border-radius:10px;padding:12px;"><div style="font-size:10px;color:var(--text-muted)">Осталось</div><div style="font-size:18px;font-weight:800">12 мес</div></div>
+          <div style="background:#f8fafc;border-radius:10px;padding:12px;"><div style="font-size:10px;color:var(--text-muted)">Прогресс</div><div style="font-size:18px;font-weight:800;color:var(--green-dark)">72%</div></div>
+        </div>
+        <div style="font-size:13px;color:var(--text-muted);line-height:1.6;">🎯 <strong>Хорошая новость:</strong> Этот кредит почти закрыт! При текущем темпе — полное погашение через 12 месяцев (март 2027).</div>`
+    }
+  };
+  const d = data[bank];
+  document.getElementById('debt-modal-title').textContent = d.title;
+  document.getElementById('debt-modal-body').innerHTML = d.body;
+  document.getElementById('debt-modal').classList.add('open');
+}
+
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+}
+
+// Close modal on overlay click
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', function(e) {
+    if(e.target === overlay) overlay.classList.remove('open');
+  });
+});
+
+// Init slider backgrounds
+document.getElementById('red-slider').style.background = 'linear-gradient(90deg, var(--red) 40%, rgba(255,255,255,0.15) 40%)';
+document.getElementById('green-slider').style.background = 'linear-gradient(90deg, var(--green) 25%, rgba(255,255,255,0.15) 25%)';
+document.getElementById('blue-slider').style.background = 'linear-gradient(90deg, #3b82f6 20%, rgba(255,255,255,0.15) 20%)';
+document.getElementById('purple-slider').style.background = 'linear-gradient(90deg, var(--purple) 15%, rgba(255,255,255,0.15) 15%)';
+document.getElementById('extra-slider').style.background = 'linear-gradient(90deg, var(--green) 30%, rgba(255,255,255,0.15) 30%)';
+</script>
+</body>
+</html>
